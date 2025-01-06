@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Login - Consultation Manager</title>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'txt': '#131313',
+                'sml-txt':'#13131399',
+                'primary': '#7E42F1',
+                'secondary': '#DF905A',
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-md">
+        <div class="mx-auto flex justify-between items-center px-5 py-4 h-[4.5rem]">
+            <a href="{{ url_for('main.index') }}" class="text-txt font-bold text-3xl flex items-center">
+                <i class="fas fa-calendar-check text-primary mr-2"></i>
+                <span class="text-primary">Consultation</span>Manager
+            </a>
+            <div class="flex space-x-4 items-center">
+                <a href="{{ url_for('auth.register') }}" class="text-primary hover:text-primary/90">
+                    Register
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Rest of the form -->
+    <div class="text-center mt-4">
+        <span>Don't have an account?</span>
+        <a href="{{ url_for('auth.register') }}" class="text-primary font-semibold">Register here</a>
+    </div>
+
+    <!-- Login Form -->
+    <div class="max-w-md mx-auto p-8 mt-10">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <!-- Logo/Icon -->
+            <div class="text-center mb-6">
+                <i class="fas fa-calendar-check text-4xl text-primary"></i>
+            </div>
+            
+            <h2 class="text-2xl text-center font-bold mb-8">Login to your account</h2>
+            <form action="#" method="POST">
+                <div class="mb-6">
+                    <label for="email" class="block text-lg font-medium text-txt mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-lg font-medium text-txt mb-2">Password</label>
+                    <input type="password" id="password" name="password" class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" required>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl hover:bg-primary/90 transition-colors">Login</button>
+            </form>
+            <div class="text-center mt-4">
+                <span>Don't have an account?</span>
+                <a href="{{ url_for('auth.register') }}" class="text-primary font-semibold">Register here</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

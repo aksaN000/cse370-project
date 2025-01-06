@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Feedback{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-txt mb-2">Submit Feedback</h1>
+            <p class="text-sml-txt">
+                For consultation with {{ booking.slot.offers[0].user.Name }} on 
+                {{ booking.slot.Date.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <form method="POST" class="space-y-6">
+                <!-- Rating -->
+                <div>
+                    <label class="block text-txt font-medium mb-2">Rating</label>
+                    <div class="flex space-x-4">
+                        {% for i in range(1, 6) %}
+                        <label class="cursor-pointer">
+                            <input type="radio" name="rating" value="{{ i }}" class="hidden" required>
+                            <i class="fas fa-star text-2xl text-gray-300 hover:text-primary transition-colors star-rating"></i>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Comment -->
+                <div>
+                    <label for="comment" class="block text-txt font-medium mb-2">Comments</label>
+                    <textarea id="comment" name="comment" rows="4"
+                            class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Share your experience..." required></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90">
+                    Submit Feedback
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    // Star rating functionality
+    document.querySelectorAll('input[name="rating"]').forEach((radio, index) => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.star-rating').forEach((star, i) => {
+                star.classList.toggle('text-primary', i <= index);
+                star.classList.toggle('text-gray-300', i > index);
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

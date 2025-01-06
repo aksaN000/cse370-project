@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Search Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-4">Search Results</h1>
+        <div class="flex flex-col md:flex-row gap-4">
+            <!-- Search Bar -->
+            <form method="GET" action="{{ url_for('main.search') }}" class="flex-1">
+                <div class="relative">
+                    <input type="text" 
+                           name="q" 
+                           value="{{ query }}"
+                           placeholder="Search faculty, departments, or courses..." 
+                           class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Filters -->
+            <div class="flex gap-4">
+                <select name="type" 
+                        onchange="this.form.submit()" 
+                        class="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="all" {% if type == 'all' %}selected{% endif %}>All</option>
+                    <option value="faculty" {% if type == 'faculty' %}selected{% endif %}>Faculty</option>
+                    <option value="st" {% if type == 'st' %}selected{% endif %}>Student Tutors</option>
+                    <option value="department" {% if type == 'department' %}selected{% endif %}>Departments</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {% if query %}
+        <!-- Search Results -->
+        {% if results %}
+            <div class="space-y-6">
+                {% for result in results %}
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start space-x-4">
+                                <div class="text-primary">
+                                    {% if result.Role == 'faculty' %}
+                                        <i class="fas fa-chalkboard-teacher text-3xl"></i>
+                                    {% elif result.Role == 'st' %}
+                                        <i class="fas fa-user-graduate text-3xl"></i>
+                                    {% else %}
+                                        <i class="fas fa-building text-3xl"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-txt">{{ result.Name }}</h3>
+                                    <p class="text-sml-txt">
+                                        {% if result.Role == 'faculty' %}
+                                            {{ result.faculty.Department }} | {{ result.faculty.Designation }}
+                                        {% elif result.Role == 'st' %}
+                                            Room {{ result.st.Room_No }}
+                                        {% endif %}
+                                    </p>
+                                    {% if result.Role in ['faculty', 'st'] %}
+                                        <p class="text-sm text-sml-txt mt-2">
+                                            <i class="far fa-clock mr-1"></i>
+                                            Consultation Hours: 
+                                            {% if result.Role == 'faculty' %}
+                                                {{ result.faculty.Consultation_Hour }}
+                                            {% else %}
+                                                {{ result.st.Consultation_Hour }}
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if current_user.is_authenticated and current_user.Role == 'student' %}
+                                <a href="{{ url_for('consultation.book', faculty_id=result.UserID) }}" 
+                                   class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                                    Book Consultation
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Pagination -->
+                {% if pages > 1 %}
+                    <div class="flex justify-center space-x-2 mt-8">
+                        {% for page in range(1, pages + 1) %}
+                            <a href="{{ url_for('main.search', q=query, type=type, page=page) }}"
+                               class="px-4 py-2 rounded-lg {% if current_page == page %}bg-primary text-white{% else %}bg-white text-txt hover:bg-primary/5{% endif %}">
+                                {{ page }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- No Results -->
+            <div class="text-center py-12 bg-white rounded-xl shadow-lg">
+                <i class="fas fa-search text-gray-300 text-5xl mb-4"></i>
+                <h3 class="text-xl font-bold text-txt mb-2">No Results Found</h3>
+                <p class="text-sml-txt">
+                    Try adjusting your search terms or filters to find what you're looking for.
+                </p>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Search Suggestions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-primary mb-4">
+                    <i class="fas fa-users text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-txt mb-2">Find Faculty</h3>
+                <p class="text-sml-txt mb-4">
+                    Search for professors and faculty members by name or department.
+                </p>
+                <a href="?type=faculty" class="text-primary hover:text-primary/90">Browse Faculty →</a>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-primary mb-4">
+                    <i class="fas fa-user-graduate text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-txt mb-2">Student Tutors</h3>
+                <p class="text-sml-txt mb-4">
+                    Find student tutors available for consultations.
+                </p>
+                <a href="?type=st" class="text-primary hover:text-primary/90">Browse Tutors →</a>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-primary mb-4">
+                    <i class="fas fa-building text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-txt mb-2">Departments</h3>
+                <p class="text-sml-txt mb-4">
+                    Browse consultations by academic department.
+                </p>
+                <a href="?type=department" class="text-primary hover:text-primary/90">Browse Departments →</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

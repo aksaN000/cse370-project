@@ -1,0 +1,46 @@
+<footer class="bg-txt text-white py-10">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h5 class="font-bold mb-4">About Us</h5>
+                <p class="text-gray-300 text-sm">Simplifying consultation management for educational institutions since 2025.</p>
+            </div>
+            <div>
+                <h5 class="font-bold mb-4">Quick Links</h5>
+                <ul class="space-y-2 text-sm">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.Role == 'student' %}
+                            <li><a href="{{ url_for('dashboard.student') }}" class="text-gray-300 hover:text-white">Dashboard</a></li>
+                            <li><a href="{{ url_for('consultation.student_book') }}" class="text-gray-300 hover:text-white">Book Consultation</a></li>
+                        {% elif current_user.Role == 'faculty' %}
+                            <li><a href="{{ url_for('dashboard.faculty') }}" class="text-gray-300 hover:text-white">Dashboard</a></li>
+                            <li><a href="{{ url_for('consultation.faculty_schedule') }}" class="text-gray-300 hover:text-white">Schedule</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li><a href="{{ url_for('main.index') }}" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="{{ url_for('auth.login') }}" class="text-gray-300 hover:text-white">Login</a></li>
+                        <li><a href="{{ url_for('auth.register') }}" class="text-gray-300 hover:text-white">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div>
+                <h5 class="font-bold mb-4">Contact</h5>
+                <ul class="space-y-2 text-sm">
+                    <li class="text-gray-300">Email: support@consultationmanager.com</li>
+                    <li class="text-gray-300">Phone: (555) 123-4567</li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="font-bold mb-4">Follow Us</h5>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-300">
+            <p>&copy; 2025 ConsultationManager. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

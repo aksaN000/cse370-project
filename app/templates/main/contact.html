@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-txt mb-4">Contact Us</h1>
+        <p class="text-sml-txt max-w-2xl mx-auto">
+            Have questions or need support? We're here to help. Reach out to us using any of the methods below.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <!-- Contact Information -->
+        <div class="space-y-8">
+            <!-- Email -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-primary mb-4">
+                    <i class="fas fa-envelope text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-txt mb-2">Email Us</h3>
+                <p class="text-sml-txt mb-3">We'll respond within 24 hours</p>
+                <a href="mailto:support@consultationmanager.com" 
+                   class="text-primary hover:text-primary/90">
+                    support@consultationmanager.com
+                </a>
+            </div>
+
+            <!-- Phone -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-primary mb-4">
+                    <i class="fas fa-phone text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-txt mb-2">Call Us</h3>
+                <p class="text-sml-txt mb-3">Monday to Friday, 9am-5pm</p>
+                <a href="tel:(555)123-4567" class="text-primary hover:text-primary/90">
+                    (555) 123-4567
+                </a>
+            </div>
+
+            <!-- Office -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-primary mb-4">
+                    <i class="fas fa-map-marker-alt text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-txt mb-2">Visit Us</h3>
+                <p class="text-sml-txt mb-3">Our office location</p>
+                <address class="text-primary not-italic">
+                    123 University Avenue<br>
+                    Building 4, Room 101<br>
+                    Campus Main, FL 12345
+                </address>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-txt mb-6">Send us a Message</h2>
+                <form method="POST" class="space-y-6">
+                    {{ form.csrf_token if form }}
+                    <!-- Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-txt mb-2">Full Name</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" 
+                                   id="name" 
+                                   name="name" 
+                                   class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-txt mb-2">Email Address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Subject -->
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-txt mb-2">Subject</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-tag text-gray-400"></i>
+                            </div>
+                            <select id="subject" 
+                                    name="subject" 
+                                    class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                    required>
+                                <option value="">Select a subject</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Message -->
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-txt mb-2">Message</label>
+                        <div class="relative">
+                            <div class="absolute top-3 left-3 text-gray-400">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <textarea id="message" 
+                                      name="message" 
+                                      rows="5" 
+                                      class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                      required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="text-center">
+        <h2 class="text-2xl font-bold text-txt mb-4">Frequently Asked Questions</h2>
+        <p class="text-sml-txt mb-6">
+            Find quick answers to common questions in our FAQ section
+        </p>
+        <a href="{{ url_for('main.faq') }}" 
+           class="inline-block bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/90 transition-colors">
+            View FAQs
+        </a>
+    </div>
+</div>
+{% endblock %}

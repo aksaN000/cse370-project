@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Book Consultation</title>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'txt': '#131313',
+                'sml-txt':'#13131399',
+                'primary': '#7E42F1',
+                'secondary': '#DF905A',
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="flex flex-col min-h-screen" style="scroll-behavior: smooth;">
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto flex justify-between items-center px-6 py-4">
+            <a href="{{ url_for('main.index') }}" class="text-txt font-bold text-3xl flex items-center">
+                <i class="fas fa-calendar-check text-primary mr-2"></i>
+                <span class="text-primary">Consultation</span>Manager
+            </a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="{{ url_for('dashboard.student') }}" class="text-txt hover:text-primary transition-colors">Dashboard</a>
+                <a href="{{ url_for('consultation.student_bookings') }}" class="text-txt hover:text-primary transition-colors">My Bookings</a>
+                <a href="{{ url_for('notifications.list_notifications') }}" class="text-txt hover:text-primary transition-colors">
+                    <i class="fas fa-bell"></i>
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="text-white bg-primary px-6 py-2 rounded-full hover:bg-primary/90 transition-colors">
+                    Logout
+                </a>
+            </div>
+            <!-- Mobile menu button -->
+            <button class="md:hidden text-txt">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </nav>
+    </header>
+    <!-- Main Content -->
+    <main class="flex-grow bg-gray-50">
+        <!-- Search and Filter Section -->
+        <section class="py-8 bg-white shadow-sm">
+            <div class="container mx-auto px-6">
+                <h1 class="text-3xl font-bold text-txt mb-8">Book a Consultation</h1>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <label class="block text-sml-txt mb-2">Department</label>
+                        <select class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+                            <option>All Departments</option>
+                            {% for department in departments %}
+                                <option>{{ department }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sml-txt mb-2">Faculty</label>
+                        <select class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+                            <option>Select Faculty</option>
+                            {% for faculty in faculties %}
+                                <option value="{{ faculty.UserID }}">{{ faculty.Name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sml-txt mb-2">Date</label>
+                        <input type="date" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sml-txt mb-2">Time Slot</label>
+                        <select class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+                            <option>Any Time</option>
+                            <option>Morning</option>
+                            <option>Afternoon</option>
+                            <option>Evening</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Available Slots Section -->
+        <section class="py-12">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% if available_slots %}
+                        {% for slot in available_slots %}
+                            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        {% if slot.offers %}
+                                            <h3 class="text-xl font-bold text-txt">{{ slot.offers[0].offering_user.Name }}</h3>
+                                            <p class="text-sml-txt">{{ slot.offers[0].offering_user.faculty_info.Department }} Department</p>
+                                        {% endif %}
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">Available</span>
+                                </div>
+                                <div class="space-y-2 mb-6">
+                                    <p class="text-txt flex items-center"><i class="far fa-calendar mr-2"></i>{{ slot.Date.strftime('%A, %B %d, %Y') }}</p>
+                                    <p class="text-txt flex items-center"><i class="far fa-clock mr-2"></i>{{ slot.StartTime.strftime('%I:%M %p') }} - {{ slot.EndTime.strftime('%I:%M %p') }}</p>
+                                    {% if slot.offers %}
+                                        <p class="text-txt flex items-center"><i class="far fa-building mr-2"></i>Room {{ slot.offers[0].ConsultationRoom }}</p>
+                                    {% endif %}
+                                </div>
+                                <form action="{{ url_for('dashboard.student_book') }}" method="POST">
+                                    <input type="hidden" name="slot_id" value="{{ slot.SlotID }}">
+                                    <div class="mb-4">
+                                        <input type="text" 
+                                            name="purpose" 
+                                            placeholder="Purpose of consultation" 
+                                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                            required>
+                                    </div>
+                                    <button type="submit" 
+                                            class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors">
+                                        Book This Slot
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-span-2 text-center py-8">
+                            <p class="text-sml-txt">No available slots found</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-txt text-white py-10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h5 class="font-bold mb-4">About Us</h5>
+                    <p class="text-gray-300 text-sm">Simplifying consultation management for educational institutions since 2025.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">Quick Links</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ url_for('dashboard.student') }}" class="text-gray-300 hover:text-white">Dashboard</a></li>
+                        <li><a href="{{ url_for('consultation.student_bookings') }}" class="text-gray-300 hover:text-white">My Bookings</a></li>
+                        <li><a href="{{ url_for('main.faq') }}" class="text-gray-300 hover:text-white">Help</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">Contact</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li class="text-gray-300">Email: support@consultationmanager.com</li>
+                        <li class="text-gray-300">Phone: (555) 123-4567</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">Follow Us</h5>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-300">
+                <p>&copy; 2025 ConsultationManager. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

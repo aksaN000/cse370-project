@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-txt mb-2">Notifications</h1>
+            <p class="text-sml-txt">
+                {{ unread_count }} unread notification{{ 's' if unread_count != 1 else '' }}
+            </p>
+        </div>
+        {% if unread_count > 0 %}
+        <a href="{{ url_for('notifications.mark_all_read') }}" 
+           class="text-primary hover:text-primary/90">
+            Mark all as read
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Notifications List -->
+    {% if notifications %}
+    <div class="space-y-4">
+        {% for notification in notifications %}
+        <div class="bg-white rounded-xl shadow-lg p-6 transition-all 
+                    {% if not notification.IsRead %}border-l-4 border-primary{% endif %}"
+             id="notification-{{ notification.NotificationID }}">
+            <div class="flex justify-between items-start">
+                <div class="flex items-start space-x-4">
+                    <div class="text-primary mt-1">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                        <p class="text-txt {% if not notification.IsRead %}font-medium{% endif %}">
+                            {{ notification.Message }}
+                        </p>
+                        <p class="text-sml-txt text-sm">
+                            {{ notification.NotificationTime.strftime('%B %d, %Y %I:%M %p') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <i class="fas fa-bell text-4xl text-gray-300 mb-4"></i>
+        <p class="text-sml-txt">No notifications</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

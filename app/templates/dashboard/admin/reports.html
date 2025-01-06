@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}System Reports{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-txt mb-2">System Reports</h1>
+            <p class="text-sml-txt">Analytics and statistics overview</p>
+        </div>
+        <!-- Date Range Filter -->
+        <div class="flex space-x-4">
+            <div>
+                <input type="date" 
+                       id="dateFrom" 
+                       class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+                <input type="date" 
+                       id="dateTo" 
+                       class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <button onclick="filterReports()" 
+                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90">
+                Apply Filter
+            </button>
+        </div>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Consultation Statistics -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-txt mb-6">Consultation Statistics</h2>
+            <div class="space-y-6">
+                <!-- Total Consultations Chart -->
+                <div>
+                    <h3 class="text-lg font-medium text-txt mb-4">Monthly Consultations</h3>
+                    <div class="h-64" id="monthlyConsultationsChart"></div>
+                </div>
+                <!-- Status Distribution -->
+                <div>
+                    <h3 class="text-lg font-medium text-txt mb-4">Status Distribution</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="p-4 rounded-lg bg-green-100">
+                            <p class="text-2xl font-bold text-green-800">{{ stats.completed }}</p>
+                            <p class="text-sm text-green-600">Completed</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-yellow-100">
+                            <p class="text-2xl font-bold text-yellow-800">{{ stats.pending }}</p>
+                            <p class="text-sm text-yellow-600">Pending</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-red-100">
+                            <p class="text-2xl font-bold text-red-800">{{ stats.cancelled }}</p>
+                            <p class="text-sm text-red-600">Cancelled</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Analytics -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-txt mb-6">Department Analytics</h2>
+            <div class="space-y-6">
+                <!-- Department Distribution Chart -->
+                <div>
+                    <h3 class="text-lg font-medium text-txt mb-4">Consultation Distribution</h3>
+                    <div class="h-64" id="departmentDistributionChart"></div>
+                </div>
+                <!-- Top Departments -->
+                <div>
+                    <h3 class="text-lg font-medium text-txt mb-4">Top Departments</h3>
+                    <div class="space-y-3">
+                        {% for dept in top_departments %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-txt">{{ dept.name }}</span>
+                            <span class="text-primary font-medium">{{ dept.count }} consultations</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Activity -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-txt mb-6">User Activity</h2>
+            <div class="space-y-6">
+                <!-- Active Users Chart -->
+                <div>
+                    <h3 class="text-lg font-medium text-txt mb-4">Active Users Trend</h3>
+                    <div class="h-64" id="userActivityChart"></div>
+                </div>
+                <!-- User Type Distribution -->
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="p-4 rounded-lg bg-primary/10">
+                        <p class="text-2xl font-bold text-primary">{{ stats.total_faculty }}</p>
+                        <p class="text-sm text-primary/80">Faculty</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-primary/10">
+                        <p class="text-2xl font-bold text-primary">{{ stats.total_st }}</p>
+                        <p class="text-sm text-primary/80">STs</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-primary/10">
+                        <p class="text-2xl font-bold text-primary">{{ stats.total_students }}</p>
+                        <p class="text-sm text-primary/80">Students</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Analysis -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-txt mb-6">Feedback Analysis</h2>
+            <div class="space-y-6">
+                <!-- Average Rating Chart -->
+                <div>
+                    <h3 class="text-lg font-medium text-txt mb-4">Rating Distribution</h3>
+                    <div class="h-64" id="feedbackChart"></div>
+                </div>
+                <!-- Overall Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center p-4 rounded-lg bg-gray-50">
+                        <p class="text-3xl font-bold text-primary">{{ "%.1f"|format(stats.avg_rating) }}</p>
+                        <p class="text-sm text-sml-txt">Average Rating</p>
+                    </div>
+                    <div class="text-center p-4 rounded-lg bg-gray-50">
+                        <p class="text-3xl font-bold text-primary">{{ stats.total_feedback }}</p>
+                        <p class="text-sm text-sml-txt">Total Feedback</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold text-txt mb-6">Export Reports</h2>
+        <div class="flex space-x-4">
+            <button onclick="exportReport('consultation')" 
+                    class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90">
+                <i class="fas fa-download mr-2"></i>Consultation Report
+            </button>
+            <button onclick="exportReport('feedback')" 
+                    class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90">
+                <i class="fas fa-download mr-2"></i>Feedback Report
+            </button>
+            <button onclick="exportReport('user')" 
+                    class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90">
+                <i class="fas fa-download mr-2"></i>User Report
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Chart configurations and data
+const chartConfigs = {
+    monthlyConsultations: {
+        type: 'line',
+        data: {
+            labels: JSON.parse('{{ monthly_labels|tojson|safe }}'),
+            datasets: [{
+                label: 'Consultations',
+                data: JSON.parse('{{ monthly_data|tojson|safe }}'),
+                borderColor: '#7E42F1',
+                backgroundColor: '#7E42F1',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    },
+    departmentDistribution: {
+        type: 'pie',
+        data: {
+            labels: JSON.parse('{{ dept_labels|tojson|safe }}'),
+            datasets: [{
+                data: JSON.parse('{{ dept_data|tojson|safe }}'),
+                backgroundColor: [
+                    '#7E42F1',
+                    '#DF905A',
+                    '#4CAF50',
+                    '#2196F3',
+                    '#9C27B0',
+                    '#FF9800'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    },
+    userActivity: {
+        type: 'line',
+        data: {
+            labels: JSON.parse('{{ activity_labels|tojson|safe }}'),
+            datasets: [{
+                label: 'Active Users',
+                data: JSON.parse('{{ activity_data|tojson|safe }}'),
+                borderColor: '#7E42F1',
+                backgroundColor: '#7E42F1',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    },
+    feedback: {
+        type: 'bar',
+        data: {
+            labels: ['1★', '2★', '3★', '4★', '5★'],
+            datasets: [{
+                label: 'Feedback Distribution',
+                data: JSON.parse('{{ feedback_data|tojson|safe }}'),
+                backgroundColor: '#7E42F1'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    }
+};
+
+// Initialize charts
+document.addEventListener('DOMContentLoaded', () => {
+    // Monthly Consultations Chart
+    new Chart(
+        document.getElementById('monthlyConsultationsChart'),
+        chartConfigs.monthlyConsultations
+    );
+
+    // Department Distribution Chart
+    new Chart(
+        document.getElementById('departmentDistributionChart'),
+        chartConfigs.departmentDistribution
+    );
+
+    // User Activity Chart
+    new Chart(
+        document.getElementById('userActivityChart'),
+        chartConfigs.userActivity
+    );
+
+    // Feedback Chart
+    new Chart(
+        document.getElementById('feedbackChart'),
+        chartConfigs.feedback
+    );
+});
+
+// Filter functionality
+function filterReports() {
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    
+    window.location.href = `/admin/reports?from=${dateFrom}&to=${dateTo}`;
+}
+
+// Export functionality
+async function exportReport(type) {
+    try {
+        const response = await fetch(`/admin/api/export/${type}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        if (!response.ok) throw new Error('Export failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${type}_report.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to export report');
+    }
+}
+</script>
+{% endblock %}

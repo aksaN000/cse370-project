@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Consultation Details{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <a href="javascript:history.back()" class="text-primary hover:text-primary/90 flex items-center mb-4">
+            <i class="fas fa-arrow-left mr-2"></i> Back
+        </a>
+        <h1 class="text-3xl font-bold text-txt mb-2">Consultation Details</h1>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Main Details -->
+        <div class="md:col-span-2 space-y-6">
+            <!-- Consultation Info Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Consultation Information</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sml-txt">Date</p>
+                            <p class="text-txt font-medium">{{ slot.Date.strftime('%B %d, %Y') }}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                            {% if slot.Status == 'available' %}bg-green-100 text-green-800
+                            {% elif slot.Status == 'booked' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ slot.Status }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-sml-txt">Time</p>
+                        <p class="text-txt font-medium">
+                            {{ slot.StartTime.strftime('%I:%M %p') }} - {{ slot.EndTime.strftime('%I:%M %p') }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sml-txt">Location</p>
+                        <p class="text-txt font-medium">{{ slot.offers[0].ConsultationRoom }}</p>
+                    </div>
+                    {% if slot.booking %}
+                    <div>
+                        <p class="text-sml-txt">Purpose</p>
+                        <p class="text-txt">{{ slot.booking.Purpose }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Consultation History -->
+            {% if slot.history %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Consultation Notes</h2>
+                <p class="text-txt whitespace-pre-line">{{ slot.history.Notes }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Feedback Section -->
+            {% if slot.history and slot.history.feedbacks %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Feedback</h2>
+                {% for feedback in slot.history.feedbacks %}
+                <div class="border-b last:border-b-0 pb-4 mb-4 last:pb-0 last:mb-0">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <div class="text-primary">
+                                {% for i in range(feedback.Rating) %}
+                                <i class="fas fa-star"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="text-sml-txt ml-2">{{ feedback.FeedbackSubmissionDate.strftime('%B %d, %Y') }}</span>
+                        </div>
+                    </div>
+                    <p class="text-txt">{{ feedback.Comment }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Participant Info -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Participants</h2>
+                
+                <!-- Faculty/ST Info -->
+                <div class="mb-6">
+                    <p class="text-sml-txt mb-2">Faculty/ST</p>
+                    <div class="flex items-center">
+                        <i class="fas fa-user-tie text-2xl text-primary mr-3"></i>
+                        <div>
+                            <p class="text-txt font-medium">{{ slot.offers[0].user.Name }}</p>
+                            <p class="text-sml-txt text-sm">{{ slot.offers[0].user.Role }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Info (if booked) -->
+                {% if slot.booking %}
+                <div>
+                    <p class="text-sml-txt mb-2">Student</p>
+                    <div class="flex items-center">
+                        <i class="fas fa-user-graduate text-2xl text-primary mr-3"></i>
+                        <div>
+                            <p class="text-txt font-medium">{{ slot.booking.user.Name }}</p>
+                            <p class="text-sml-txt text-sm">{{ slot.booking.user.student.Department }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            {% if current_user.Role == 'faculty' and slot.booking and slot.Status != 'completed' %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Actions</h2>
+                <form action="{{ url_for('consultation.update_booking_status', booking_id=slot.booking.BookingID) }}" method="POST" class="space-y-4">
+                    <select name="status" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+                        <option value="completed">Mark as Completed</option>
+                        <option value="cancelled">Cancel Consultation</option>
+                    </select>
+                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90">
+                        Update Status
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

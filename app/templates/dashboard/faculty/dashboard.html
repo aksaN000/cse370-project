@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Welcome Section -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-2">Welcome, Dr. {{ current_user.Name }}</h1>
+        <p class="text-sml-txt">{{ faculty.Department }} | {{ faculty.Designation }}</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Total Consultations</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.total_consultations }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-users text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Today's Consultations</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.todays_consultations }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-calendar-day text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Pending Requests</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.pending_requests }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-clock text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Upcoming Slots</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.upcoming_slots }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-calendar-alt text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Today's Schedule -->
+        <div class="md:col-span-2 space-y-8">
+            <!-- Today's Consultations -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-txt">Today's Schedule</h2>
+                    <a href="{{ url_for('consultation.faculty_schedule') }}" class="text-primary hover:text-primary/90">
+                        <i class="fas fa-plus mr-1"></i> Create Slot
+                    </a>
+                </div>
+                {% if today_slots %}
+                <div class="space-y-4">
+                    {% for slot in today_slots %}
+                    <div class="border-b last:border-b-0 pb-4 last:pb-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-txt">
+                                    {{ slot.StartTime.strftime('%I:%M %p') }} - 
+                                    {{ slot.EndTime.strftime('%I:%M %p') }}
+                                </p>
+                                <p class="text-sml-txt text-sm">Room: {{ slot.ConsultationRoom }}</p>
+                                {% if slot.booking %}
+                                <p class="text-sml-txt text-sm">
+                                    Student: {{ slot.booking.user.Name }} |
+                                    Purpose: {{ slot.booking.Purpose }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if slot.Status == 'available' %}bg-green-100 text-green-800
+                                {% elif slot.Status == 'booked' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ slot.Status }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <p class="text-sml-txt">No consultations scheduled for today</p>
+                    <a href="{{ url_for('consultation.faculty_schedule') }}" 
+                       class="mt-4 inline-block bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90">
+                        Schedule Consultation
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Pending Requests -->
+            {% if pending_bookings %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Pending Requests</h2>
+                <div class="space-y-4">
+                    {% for booking in pending_bookings %}
+                    <div class="border-b last:border-b-0 pb-4 last:pb-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-txt">{{ booking.user.Name }}</p>
+                                <p class="text-sml-txt text-sm">
+                                    {{ booking.slot.Date.strftime('%B %d, %Y') }} |
+                                    {{ booking.slot.StartTime.strftime('%I:%M %p') }}
+                                </p>
+                                <p class="text-sml-txt text-sm">Purpose: {{ booking.Purpose }}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <form action="{{ url_for('consultation.update_booking_status', booking_id=booking.BookingID) }}" 
+                                      method="POST" class="inline">
+                                    <input type="hidden" name="status" value="confirmed">
+                                    <button type="submit" class="text-green-600 hover:text-green-700">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('consultation.update_booking_status', booking_id=booking.BookingID) }}"
+                                      method="POST" class="inline">
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="text-red-600 hover:text-red-700">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Quick Actions</h2>
+                <div class="space-y-4">
+                    <a href="{{ url_for('consultation.faculty_schedule') }}" 
+                       class="block w-full text-center bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
+                        Create New Slot
+                    </a>
+                    <a href="{{ url_for('consultation.history') }}"
+                       class="block w-full text-center border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary/5">
+                        View History
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Feedback -->
+            {% if recent_feedback %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Recent Feedback</h2>
+                <div class="space-y-4">
+                    {% for feedback in recent_feedback %}
+                    <div class="{% if not loop.last %}border-b pb-4{% endif %}">
+                        <div class="flex items-center mb-1">
+                            <div class="text-primary">
+                                {% for i in range(feedback.Rating) %}
+                                <i class="fas fa-star text-sm"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="text-sml-txt text-xs ml-2">
+                                {{ feedback.FeedbackSubmissionDate.strftime('%B %d, %Y') }}
+                            </span>
+                        </div>
+                        <p class="text-txt text-sm">{{ feedback.Comment }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

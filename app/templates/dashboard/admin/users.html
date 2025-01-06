@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-txt mb-2">User Management</h1>
+            <p class="text-sml-txt">Manage system users and their roles</p>
+        </div>
+        <div class="flex space-x-4">
+            <input type="text" 
+                   id="searchInput" 
+                   placeholder="Search users..." 
+                   class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            <select id="roleFilter" 
+                    class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">All Roles</option>
+                <option value="student">Students</option>
+                <option value="faculty">Faculty</option>
+                <option value="st">ST</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Department</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in users %}
+                    <tr class="user-row" data-name="{{ user.Name|lower }}" data-role="{{ user.Role|lower }}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-circle text-2xl text-primary mr-3"></i>
+                                <div>
+                                    <div class="text-sm font-medium text-txt">{{ user.Name }}</div>
+                                    {% if user.Role == 'faculty' and user.faculty %}
+                                        <div class="text-sm text-sml-txt">{{ user.faculty.Designation }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">{{ user.Email }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {% if user.Role == 'admin' %}bg-primary/10 text-primary
+                                {% elif user.Role == 'faculty' %}bg-blue-100 text-blue-800
+                                {% elif user.Role == 'st' %}bg-green-100 text-green-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ user.Role }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">
+                            {% if user.Role == 'faculty' and user.faculty %}
+                                {{ user.faculty.Department }}
+                            {% elif user.Role == 'student' and user.student %}
+                                {{ user.student.Department }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-3">
+                                <button type="button" 
+                                        onclick="showUserDetails('{{ user.UserID }}')"
+                                        class="text-primary hover:text-primary/90">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% if user.Role != 'admin' %}
+                                <button type="button"
+                                        onclick="showEditForm('{{ user.UserID }}')"
+                                        class="text-blue-600 hover:text-blue-900">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button"
+                                        onclick="confirmDeactivate('{{ user.UserID }}')"
+                                        class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div id="userDetailsModal" 
+     class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full"
+     style="z-index: 50;">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-xl font-bold text-txt">User Details</h3>
+            <button onclick="closeModal('userDetailsModal')" class="text-gray-400 hover:text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="userDetailsContent" class="mt-4 space-y-3">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editUserModal" 
+     class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full"
+     style="z-index: 50;">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-xl font-bold text-txt">Edit User</h3>
+            <button onclick="closeModal('editUserModal')" class="text-gray-400 hover:text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="editUserForm" class="mt-4 space-y-4">
+            <input type="hidden" id="editUserId" name="userId">
+            <div>
+                <label class="block text-sm font-medium text-txt mb-1">Name</label>
+                <input type="text" id="editName" name="name" 
+                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-txt mb-1">Email</label>
+                <input type="email" id="editEmail" name="email" 
+                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-txt mb-1">Department</label>
+                <input type="text" id="editDepartment" name="department" 
+                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" 
+                        onclick="closeModal('editUserModal')"
+                        class="px-4 py-2 border text-txt rounded-lg hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Search and filter functionality
+const searchInput = document.getElementById('searchInput');
+const roleFilter = document.getElementById('roleFilter');
+
+function filterUsers() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedRole = roleFilter.value.toLowerCase();
+    
+    document.querySelectorAll('.user-row').forEach(row => {
+        const name = row.dataset.name;
+        const role = row.dataset.role;
+        const matchesSearch = name.includes(searchTerm);
+        const matchesRole = !selectedRole || role === selectedRole;
+        
+        row.style.display = matchesSearch && matchesRole ? '' : 'none';
+    });
+}
+
+searchInput.addEventListener('input', filterUsers);
+roleFilter.addEventListener('change', filterUsers);
+
+// Modal functionality
+function showModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+async function showUserDetails(userId) {
+    try {
+        const response = await fetch(`/admin/api/user/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch user details');
+        
+        const user = await response.json();
+        const content = document.getElementById('userDetailsContent');
+        
+        content.innerHTML = `
+            <p><strong>Name:</strong> ${user.name}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Role:</strong> ${user.role}</p>
+            <p><strong>Department:</strong> ${user.department || '-'}</p>
+            <p><strong>Join Date:</strong> ${user.joinDate}</p>
+        `;
+        
+        showModal('userDetailsModal');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load user details');
+    }
+}
+
+async function showEditForm(userId) {
+    try {
+        const response = await fetch(`/admin/api/user/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch user details');
+        
+        const user = await response.json();
+        document.getElementById('editUserId').value = userId;
+        document.getElementById('editName').value = user.name;
+        document.getElementById('editEmail').value = user.email;
+        document.getElementById('editDepartment').value = user.department || '';
+        
+        showModal('editUserModal');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load user details');
+    }
+}
+
+function confirmDeactivate(userId) {
+    if (confirm('Are you sure you want to deactivate this user?')) {
+        deactivateUser(userId);
+    }
+}
+
+async function deactivateUser(userId) {
+    try {
+        const response = await fetch(`/admin/api/user/${userId}/deactivate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        });
+        
+        if (!response.ok) throw new Error('Failed to deactivate user');
+        
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to deactivate user');
+    }
+}
+
+// Form submission handling
+document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const userId = formData.get('userId');
+    
+    try {
+        const response = await fetch(`/admin/api/user/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(Object.fromEntries(formData))
+        });
+        
+        if (!response.ok) throw new Error('Failed to update user');
+        
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update user');
+    }
+});
+</script>
+{% endblock %}

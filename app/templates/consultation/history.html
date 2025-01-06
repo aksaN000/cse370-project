@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Consultation History{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-2">Consultation History</h1>
+        <p class="text-sml-txt">View all your past consultations and their details</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-txt mb-2">Date Range</label>
+                <input type="date" name="date_from" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-txt mb-2">To</label>
+                <input type="date" name="date_to" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-txt mb-2">Status</label>
+                <select name="status" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
+                    <option value="">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-primary text-white p-2 rounded-lg hover:bg-primary/90">
+                    Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- History List -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        {% if bookings %}
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Date</th>
+                    {% if current_user.Role == 'student' %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Faculty/ST</th>
+                    {% else %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Student</th>
+                    {% endif %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Purpose</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-txt uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for booking in bookings %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">
+                        {{ booking.slot.Date.strftime('%B %d, %Y') }}
+                    </td>
+                    {% if current_user.Role == 'student' %}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">
+                        {{ booking.slot.offers[0].user.Name }}
+                    </td>
+                    {% else %}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">
+                        {{ booking.user.Name }}
+                    </td>
+                    {% endif %}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">
+                        {{ booking.slot.StartTime.strftime('%I:%M %p') }} - {{ booking.slot.EndTime.strftime('%I:%M %p') }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-txt">
+                        {{ booking.Purpose }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if booking.BookingStatus == 'completed' %}bg-green-100 text-green-800
+                            {% elif booking.BookingStatus == 'cancelled' %}bg-red-100 text-red-800
+                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ booking.BookingStatus }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-txt">
+                        <a href="{{ url_for('consultation.slot_details', slot_id=booking.SlotID) }}" 
+                           class="text-primary hover:text-primary/90">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+            <p class="text-sml-txt">No consultation history found</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

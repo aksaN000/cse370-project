@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Student Tutor Profile{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-2">My Profile</h1>
+        <p class="text-sml-txt">View and update your student tutor profile</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-4">Profile Details</h2>
+                <form method="POST" action="{{ url_for('auth.profile') }}">
+                    <div class="mb-4">
+                        <label class="block text-txt mb-2" for="name">Name</label>
+                        <input class="w-full px-3 py-2 text-txt border rounded-md" type="text" id="name" name="name" 
+                               value="{{ current_user.Name }}" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-txt mb-2" for="email">Email</label>
+                        <input class="w-full px-3 py-2 text-txt border rounded-md" type="email" id="email" name="email"
+                               value="{{ current_user.Email }}" disabled>  
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-txt mb-2" for="room_no">Room Number</label>
+                        <input class="w-full px-3 py-2 text-txt border rounded-md" type="text" id="room_no" name="room_no"
+                               value="{{ st.Room_No }}" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-txt mb-2" for="consultation_hour">Consultation Hours</label>
+                        <input class="w-full px-3 py-2 text-txt border rounded-md" type="text" id="consultation_hour" name="consultation_hour"
+                               value="{{ st.Consultation_Hour }}" required>
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-4">Profile Picture</h2>
+                <div class="mb-4">
+                    <img src="{{ url_for('static', filename='img/default-avatar.png') }}" 
+                         alt="Profile Picture" class="w-32 h-32 mx-auto rounded-full">
+                </div>
+                <!-- Temporarily removed picture upload until functionality is implemented -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

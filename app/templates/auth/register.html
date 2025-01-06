@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Register - Consultation Manager</title>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'txt': '#131313',
+                'sml-txt':'#13131399',
+                'primary': '#7E42F1',
+                'secondary': '#DF905A',
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-md">
+        <div class="mx-auto flex justify-between items-center px-5 py-4 h-[4.5rem]">
+            <a href="{{ url_for('main.index') }}" class="text-txt font-bold text-3xl flex items-center">
+                <i class="fas fa-calendar-check text-primary mr-2"></i>
+                <span class="text-primary">Consultation</span>Manager
+            </a>
+            <div class="flex space-x-4 items-center">
+                <a href="{{ url_for('auth.login') }}" class="text-primary hover:text-primary/90">
+                    Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Form -->
+    <div class="max-w-lg mx-auto p-8 mt-10">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-txt">Create Your Account</h2>
+                <p class="text-sml-txt mt-2">Join our consultation management platform</p>
+            </div>
+            
+            <!-- Updated form action to use auth.register -->
+            <form action="{{ url_for('auth.register') }}" method="POST">
+                <!-- Name -->
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-medium text-txt mb-2">Full Name</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" name="name" id="name" 
+                               class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-medium text-txt mb-2">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" name="email" id="email" 
+                               class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-txt mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" name="password" id="password" 
+                               class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="Create a password" required>
+                    </div>
+                </div>
+
+                <!-- Role -->
+                <div class="mb-6">
+                    <label for="role" class="block text-sm font-medium text-txt mb-2">Select Your Role</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user-tag text-gray-400"></i>
+                        </div>
+                        <select name="role" id="role" 
+                                class="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none"
+                                required>
+                            <option value="" disabled selected>Choose your role</option>
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty</option>
+                            <option value="st">ST</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="mb-6">
+                    <button type="submit" 
+                            class="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200 flex items-center justify-center">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Create Account
+                    </button>
+                </div>
+
+                <p class="text-center text-sml-txt">
+                    Already have an account? 
+                    <a href="{{ url_for('auth.login') }}" class="text-primary hover:text-primary/90 font-medium">
+                        Sign in
+                    </a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-6 text-center text-sml-txt">
+        <p>&copy; 2025 Consultation Manager. All rights reserved.</p>
+    </footer>
+</body>
+</html>

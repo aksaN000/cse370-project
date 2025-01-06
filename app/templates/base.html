@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}{% endblock %} - Consultation Manager</title>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'txt': '#131313',
+                'sml-txt':'#13131399',
+                'primary': '#7E42F1',
+                'secondary': '#DF905A',
+              }
+            }
+          }
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed top-20 right-4 z-50 space-y-2">
+                {% for category, message in messages %}
+                    <div class="bg-white px-6 py-4 rounded-lg shadow-lg border-l-4 {% if category == 'error' %}border-red-500{% else %}border-primary{% endif %} animate-fade-in-down">
+                        <p class="text-txt">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% include 'components/header.html' %}
+
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'components/footer.html' %}
+
+    <!-- Common Scripts -->
+    <script>
+        // Auto-hide flash messages after 3 seconds
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.animate-fade-in-down');
+            flashMessages.forEach(function(msg) {
+                msg.style.opacity = '0';
+                msg.style.transition = 'opacity 0.5s ease-in-out';
+                setTimeout(function() {
+                    msg.remove();
+                }, 500);
+            });
+        }, 3000);
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

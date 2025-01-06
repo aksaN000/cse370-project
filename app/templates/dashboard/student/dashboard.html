@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Welcome Section -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-2">Welcome, {{ current_user.Name }}</h1>
+        <p class="text-sml-txt">{{ student.Department }} | {{ student.Course }}</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Total Consultations</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.total_consultations }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-calendar-check text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">My Reviews</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.my_reviews }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-clock text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Completed Consultations</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.completed_consultations }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-check-circle text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Today's Schedule -->
+        <div class="md:col-span-2 space-y-8">
+            <!-- Upcoming Consultations -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-txt">Today's Schedule</h2>
+                    <a href="{{ url_for('consultation.student_book') }}" class="text-primary hover:text-primary/90">
+                        <i class="fas fa-plus mr-1"></i> Book Consultation
+                    </a>
+                </div>
+                {% if bookings_today %}
+                <div class="space-y-4">
+                    {% for booking in bookings_today %}
+                    <div class="border-b last:border-b-0 pb-4 last:pb-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-txt">
+                                    {{ booking.slot.StartTime.strftime('%I:%M %p') }} - 
+                                    {{ booking.slot.EndTime.strftime('%I:%M %p') }}
+                                </p>
+                                <p class="text-sml-txt text-sm">Faculty: {{ booking.slot.offers[0].user.Name }}</p>
+                                <p class="text-sml-txt text-sm">Room: {{ booking.slot.offers[0].ConsultationRoom }}</p>
+                            </div>
+                            <div>
+                                <span class="px-2 py-1 text-xs rounded-full 
+                                    {% if booking.BookingStatus == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif booking.BookingStatus == 'confirmed' %}bg-green-100 text-green-800  
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ booking.BookingStatus }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <p class="text-sml-txt">No consultations scheduled for today</p>
+                    <a href="{{ url_for('consultation.student_book') }}" 
+                       class="mt-4 inline-block bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90">
+                        Book Consultation
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Upcoming Consultations -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Upcoming Consultations</h2>
+                {% if upcoming_bookings %}
+                <div class="space-y-4">
+                    {% for booking in upcoming_bookings %}
+                    <div class="border-b last:border-b-0 pb-4 last:pb-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-txt">{{ booking.slot.Date.strftime('%B %d, %Y') }}</p>
+                                <p class="text-sml-txt text-sm">
+                                    {{ booking.slot.StartTime.strftime('%I:%M %p') }} - 
+                                    {{ booking.slot.EndTime.strftime('%I:%M %p') }}
+                                </p>
+                                <p class="text-sml-txt text-sm">Faculty: {{ booking.slot.offers[0].user.Name }}</p>
+                                <p class="text-sml-txt text-sm">Room: {{ booking.slot.offers[0].ConsultationRoom }}</p>
+                            </div>
+                            <div>
+                                <span class="px-2 py-1 text-xs rounded-full 
+                                    {% if booking.BookingStatus == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif booking.BookingStatus == 'confirmed' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ booking.BookingStatus }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-sml-txt py-4">No upcoming consultations scheduled</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Quick Actions</h2>
+                <div class="space-y-4">
+                    <a href="{{ url_for('consultation.student_book') }}" 
+                       class="block w-full text-center bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
+                        Book Consultation
+                    </a>
+                    <a href="{{ url_for('consultation.student_bookings') }}"
+                       class="block w-full text-center border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary/5">
+                        View Bookings
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feedback History -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Feedback History</h2>
+                {% if recent_feedback %}
+                <div class="space-y-4">
+                    {% for feedback in recent_feedback %}
+                    <div class="border-b last:border-b-0 pb-4 last:pb-0">
+                        <p class="font-medium text-txt">{{ feedback.slot.offers[0].user.Name }}</p>
+                        <div class="flex items-center">
+                            <div class="text-primary">
+                                {% for i in range(feedback.Rating) %}
+                                <i class="fas fa-star text-xs"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="text-sml-txt text-xs ml-2">
+                                {{ feedback.FeedbackSubmissionDate.strftime('%B %d, %Y') }}
+                            </span>
+                        </div>
+                        <p class="text-sml-txt text-sm mt-1">{{ feedback.Comment }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-sml-txt">No feedback history yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

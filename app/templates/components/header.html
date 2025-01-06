@@ -1,0 +1,121 @@
+<!-- app/templates/components/header.html -->
+<header class="bg-white shadow-md">
+    <nav class="container mx-auto flex justify-between items-center px-6 py-4">
+        <a href="{{ url_for('main.index') }}" class="text-txt font-bold text-3xl flex items-center">
+            <i class="fas fa-calendar-check text-primary mr-2"></i>
+            <span class="text-primary">Consultation</span>Manager
+        </a>
+        
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex space-x-6 items-center">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard.profile') }}" class="text-txt hover:text-primary transition-colors">
+                    Profile
+                </a>
+                {% if current_user.Role == 'student' %}
+                    <a href="{{ url_for('dashboard.student') }}" class="text-txt hover:text-primary transition-colors">
+                        Dashboard
+                    </a>
+                    <a href="{{ url_for('consultation.book') }}" class="text-txt hover:text-primary transition-colors">
+                        Book Consultation
+                    </a>
+                {% elif current_user.Role == 'faculty' %}
+                    <a href="{{ url_for('dashboard.faculty') }}" class="text-txt hover:text-primary transition-colors">
+                        Dashboard
+                    </a>
+                    <a href="{{ url_for('consultation.faculty_schedule') }}" class="text-txt hover:text-primary transition-colors">
+                        Schedule
+                    </a>
+                {% elif current_user.Role == 'st' %}
+                    <a href="{{ url_for('dashboard.st') }}" class="text-txt hover:text-primary transition-colors">
+                        Dashboard
+                    </a>
+                    <a href="{{ url_for('consultation.st_schedule') }}" class="text-txt hover:text-primary transition-colors">
+                        Schedule
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('notifications.list_notifications') }}" class="text-txt hover:text-primary transition-colors">
+                    <i class="fas fa-bell"></i>
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="text-white bg-primary px-6 py-2 rounded-full hover:bg-primary/90 transition-colors">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="text-txt hover:text-primary transition-colors">
+                    Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="text-white bg-primary px-6 py-2 rounded-full hover:bg-primary/90 transition-colors">
+                    Register
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden text-txt relative" id="mobileMenuButton">
+            <button>
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <div id="mobileMenu" class="absolute right-0 mt-2 w-full bg-white rounded-lg shadow-lg py-4 hidden z-10">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard.profile') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                        Profile
+                    </a>
+                    {% if current_user.Role == 'student' %}
+                        <a href="{{ url_for('dashboard.student') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                            Dashboard
+                        </a>
+                        <a href="{{ url_for('consultation.book') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                            Book Consultation
+                        </a>
+                    {% elif current_user.Role == 'faculty' %}
+                        <a href="{{ url_for('dashboard.faculty') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                            Dashboard
+                        </a>
+                        <a href="{{ url_for('consultation.faculty_schedule') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                            Schedule
+                        </a>
+                    {% elif current_user.Role == 'st' %}
+                        <a href="{{ url_for('dashboard.st') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                            Dashboard
+                        </a>
+                        <a href="{{ url_for('consultation.st_schedule') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                            Schedule
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('notifications.list_notifications') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                        <i class="fas fa-bell"></i> Notifications
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                        Logout
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                        Login
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="block px-6 py-2 text-txt hover:bg-primary/5 hover:text-primary">
+                        Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script>
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    let isMenuVisible = false;
+
+    mobileMenuButton.addEventListener('click', () => {
+        isMenuVisible = !isMenuVisible;
+        mobileMenu.classList.toggle('hidden', !isMenuVisible);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+            mobileMenu.classList.add('hidden');
+            isMenuVisible = false;
+        }
+    });
+</script>

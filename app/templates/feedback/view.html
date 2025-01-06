@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}View Feedback{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="javascript:history.back()" class="text-primary hover:text-primary/90 flex items-center mb-4">
+                <i class="fas fa-arrow-left mr-2"></i> Back
+            </a>
+            <h1 class="text-3xl font-bold text-txt mb-2">Consultation Feedback</h1>
+            <p class="text-sml-txt">
+                {{ booking.slot.Date.strftime('%B %d, %Y') }} | 
+                {{ booking.slot.StartTime.strftime('%I:%M %p') }} - 
+                {{ booking.slot.EndTime.strftime('%I:%M %p') }}
+            </p>
+        </div>
+
+        <!-- Consultation Details -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sml-txt">Faculty/ST</p>
+                    <p class="text-txt font-medium">{{ booking.slot.offers[0].user.Name }}</p>
+                </div>
+                <div>
+                    <p class="text-sml-txt">Student</p>
+                    <p class="text-txt font-medium">{{ booking.user.Name }}</p>
+                </div>
+                <div>
+                    <p class="text-sml-txt">Purpose</p>
+                    <p class="text-txt">{{ booking.Purpose }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback List -->
+        {% if feedbacks %}
+        <div class="space-y-6">
+            {% for feedback in feedbacks %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <div class="flex items-center mb-2">
+                            <div class="text-primary">
+                                {% for i in range(feedback.Rating) %}
+                                <i class="fas fa-star"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="text-sml-txt ml-2">
+                                {{ feedback.FeedbackSubmissionDate.strftime('%B %d, %Y') }}
+                            </span>
+                        </div>
+                        <p class="text-sml-txt">
+                            By: {{ feedback.submitted_by_user.Name }} 
+                            ({{ feedback.submitted_by_user.Role }})
+                        </p>
+                    </div>
+                </div>
+                <p class="text-txt">{{ feedback.Comment }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+            <i class="fas fa-comment-alt text-4xl text-gray-300 mb-4"></i>
+            <p class="text-sml-txt">No feedback submitted yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

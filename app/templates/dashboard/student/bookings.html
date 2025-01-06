@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-2">My Bookings</h1>
+        <p class="text-sml-txt">Manage your consultation bookings</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-txt">Upcoming Consultations</h2>
+            <a href="{{ url_for('consultation.student_book') }}" class="text-primary hover:text-primary/90">
+                <i class="fas fa-plus mr-1"></i> Book New
+            </a>
+        </div>
+        {% if bookings %}
+        <div class="space-y-4">
+            {% for booking in bookings %}
+            <div class="border-b border-gray-200 last:border-b-0 pb-4 last:pb-0">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-medium text-txt">
+                            {% if booking.slot and booking.slot.faculty %}
+                                {{ booking.slot.faculty.Name or 'Unknown Faculty' }}
+                                {% if booking.slot.Subject %}
+                                    - {{ booking.slot.Subject }}
+                                {% endif %}
+                            {% else %}
+                                Unknown Consultation
+                            {% endif %}
+                        </p>
+                        <p class="text-sml-txt text-sm">
+                            {% if booking.slot and booking.slot.Date %}
+                                {{ booking.slot.Date.strftime('%B %d, %Y') }} | 
+                                {{ booking.slot.StartTime.strftime('%I:%M %p') }} - 
+                                {{ booking.slot.EndTime.strftime('%I:%M %p') }}
+                            {% else %}
+                                Date/Time Not Available
+                            {% endif %}
+                        </p>
+                        <p class="text-sml-txt text-sm">
+                            Room: {{ (booking.slot.ConsultationRoom if booking.slot else 'Not specified') or 'Not specified' }}
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2 py-1 text-xs rounded-full 
+                            {% if booking.BookingStatus == 'confirmed' %}bg-green-100 text-green-800
+                            {% elif booking.BookingStatus == 'cancelled' %}bg-red-100 text-red-800  
+                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ (booking.BookingStatus or 'Pending')|title }}
+                        </span>
+                        {% if booking.BookingStatus and booking.BookingStatus not in ['cancelled', 'completed'] %}
+                        <form action="{{ url_for('consultation.cancel_booking', booking_id=booking.BookingID) }}" 
+                              method="POST" 
+                              class="inline"
+                              onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                            <button type="submit" class="px-2 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                                Cancel
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-sml-txt">No upcoming consultations</p>
+            <a href="{{ url_for('consultation.student_book') }}" 
+               class="mt-4 inline-block bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition-colors">
+                Book a Consultation
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

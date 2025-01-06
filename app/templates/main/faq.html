@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Frequently Asked Questions{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-txt mb-4">Frequently Asked Questions</h1>
+        <p class="text-sml-txt max-w-2xl mx-auto">
+            Find answers to common questions about using ConsultationManager.
+        </p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="max-w-2xl mx-auto mb-12">
+        <div class="relative">
+            <input type="text" 
+                   id="faqSearch" 
+                   placeholder="Search FAQ..." 
+                   class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Categories -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <!-- For Students -->
+        <div class="space-y-4">
+            <h2 class="text-2xl font-bold text-txt mb-6">For Students</h2>
+            
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden faq-item">
+                <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+                    <span class="font-medium text-txt">How do I book a consultation?</span>
+                    <i class="fas fa-chevron-down text-primary transition-transform"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-sml-txt">
+                        To book a consultation:
+                        1. Log in to your account
+                        2. Go to "Book Consultation"
+                        3. Select your preferred faculty/ST
+                        4. Choose an available time slot
+                        5. Submit your booking request
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden faq-item">
+                <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+                    <span class="font-medium text-txt">How can I cancel my booking?</span>
+                    <i class="fas fa-chevron-down text-primary transition-transform"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-sml-txt">
+                        You can cancel your booking up to 24 hours before the scheduled time through your dashboard. 
+                        Go to "My Bookings" and click the cancel button next to the relevant consultation.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- For Faculty -->
+        <div class="space-y-4">
+            <h2 class="text-2xl font-bold text-txt mb-6">For Faculty</h2>
+            
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden faq-item">
+                <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+                    <span class="font-medium text-txt">How do I set my availability?</span>
+                    <i class="fas fa-chevron-down text-primary transition-transform"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-sml-txt">
+                        Set your availability by:
+                        1. Going to your dashboard
+                        2. Clicking "Schedule Slots"
+                        3. Selecting dates and times
+                        4. Setting recurring slots if needed
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden faq-item">
+                <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+                    <span class="font-medium text-txt">How do I view my consultation history?</span>
+                    <i class="fas fa-chevron-down text-primary transition-transform"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-sml-txt">
+                        Access your consultation history through your dashboard under the "History" tab. 
+                        You can view past consultations, feedback, and notes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Support -->
+        <div class="space-y-4">
+            <h2 class="text-2xl font-bold text-txt mb-6">Technical Support</h2>
+            
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden faq-item">
+                <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+                    <span class="font-medium text-txt">How do I reset my password?</span>
+                    <i class="fas fa-chevron-down text-primary transition-transform"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-sml-txt">
+                        Click "Forgot Password" on the login page and follow the instructions sent to your email 
+                        to reset your password.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden faq-item">
+                <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+                    <span class="font-medium text-txt">Why am I not receiving notifications?</span>
+                    <i class="fas fa-chevron-down text-primary transition-transform"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-sml-txt">
+                        Check your notification settings in your profile and ensure your email is verified. 
+                        Also check your spam folder for emails from our system.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Still Need Help Section -->
+    <div class="bg-primary/5 rounded-xl p-8 text-center">
+        <h2 class="text-2xl font-bold text-txt mb-4">Still Need Help?</h2>
+        <p class="text-sml-txt mb-6">
+            Can't find what you're looking for? Our support team is here to help.
+        </p>
+        <a href="{{ url_for('main.contact') }}" 
+           class="inline-block bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/90 transition-colors">
+            Contact Support
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// FAQ Accordion functionality
+document.querySelectorAll('.faq-item button').forEach(button => {
+    button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('i');
+        
+        // Toggle current item
+        content.classList.toggle('hidden');
+        icon.classList.toggle('rotate-180');
+        
+        // Optional: Close other items
+        document.querySelectorAll('.faq-item button').forEach(otherButton => {
+            if (otherButton !== button) {
+                const otherContent = otherButton.nextElementSibling;
+                const otherIcon = otherButton.querySelector('i');
+                otherContent.classList.add('hidden');
+                otherIcon.classList.remove('rotate-180');
+            }
+        });
+    });
+});
+
+// FAQ Search functionality
+document.getElementById('faqSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const question = item.querySelector('button span').textContent.toLowerCase();
+        const answer = item.querySelector('div p').textContent.toLowerCase();
+        
+        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Welcome Section -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-txt mb-2">Admin Dashboard</h1>
+        <p class="text-sml-txt">System Overview and Management</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Total Users</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.total_users }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-users text-3xl"></i>
+                </div>
+            </div>
+            <div class="mt-2 grid grid-cols-2 gap-2 text-xs text-sml-txt">
+                <span>Faculty: {{ stats.total_faculty }}</span>
+                <span>Students: {{ stats.total_students }}</span>
+                <span>STs: {{ stats.total_st }}</span>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Total Consultations</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.total_consultations }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-calendar-check text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Pending Bookings</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ stats.pending_bookings }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-clock text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sml-txt">Department Stats</p>
+                    <h3 class="text-3xl font-bold text-txt">{{ dept_stats|length }}</h3>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-building text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Left Section - Recent Activities -->
+        <div class="md:col-span-2 space-y-8">
+            <!-- Recent Bookings -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Recent Bookings</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-txt tracking-wider">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-txt tracking-wider">Student</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-txt tracking-wider">Faculty/ST</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-txt tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for booking in recent_bookings %}
+                            <tr>
+                                <td class="px-4 py-3 text-sm text-txt">
+                                    {{ booking.BookingDate.strftime('%B %d, %Y') }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-txt">{{ booking.user.Name }}</td>
+                                <td class="px-4 py-3 text-sm text-txt">{{ booking.slot.offers[0].user.Name }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 text-xs rounded-full 
+                                        {% if booking.BookingStatus == 'completed' %}bg-green-100 text-green-800
+                                        {% elif booking.BookingStatus == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ booking.BookingStatus }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Users -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Recent Users</h2>
+                <div class="space-y-4">
+                    {% for user in recent_users %}
+                    <div class="flex items-center justify-between {% if not loop.last %}border-b pb-4{% endif %}">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-user-circle text-2xl text-primary"></i>
+                            <div>
+                                <p class="font-medium text-txt">{{ user.Name }}</p>
+                                <p class="text-sml-txt text-sm">{{ user.Email }}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+                            {{ user.Role }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section - Quick Actions & Department Stats -->
+        <div class="space-y-8">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Quick Actions</h2>
+                <div class="space-y-4">
+                    <a href="{{ url_for('dashboard.admin_users') }}" 
+                       class="block w-full text-center bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
+                        Manage Users
+                    </a>
+                    <a href="{{ url_for('dashboard.admin_reports') }}"
+                       class="block w-full text-center border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary/5">
+                        View Reports
+                    </a>
+                </div>
+            </div>
+
+            <!-- Department Statistics -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">Department Statistics</h2>
+                <div class="space-y-4">
+                    {% for dept in dept_stats %}
+                    <div class="{% if not loop.last %}border-b pb-4{% endif %}">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-medium text-txt">{{ dept[0] or 'Unassigned' }}</p>
+                            <span class="text-primary font-bold">{{ dept[1] }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            {% if dept_stats[0][1] > 0 %}
+                            <div class="bg-primary rounded-full h-2 {% if dept_stats[0][1] > 0 %}w-[{{ dept.percentage }}%]{% else %}w-0{% endif %}">
+                            </div>
+                            {% else %}
+                            <div class="bg-primary rounded-full h-2 w-0"></div>
+                            {% endif %}
+                        </div>
+                            {% else %}
+                            <div class="bg-primary rounded-full h-2" style="width: 0%"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-txt mb-6">System Health</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sml-txt">Database Status</span>
+                        <span class="text-green-500"><i class="fas fa-check-circle"></i> Operational</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sml-txt">Last Backup</span>
+                        <span class="text-txt">{{ datetime.now().strftime('%B %d, %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
